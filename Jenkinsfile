@@ -68,6 +68,18 @@ pipeline {
             }
         }
 
+        stage('Prepare SSH') {
+            steps {
+                sh '''
+                    mkdir -p ~/.ssh
+                    chmod 700 ~/.ssh
+
+                    ssh-keyscan -H "$APP_HOST" >> ~/.ssh/known_hosts
+
+                    chmod 600 ~/.ssh/known_hosts
+                '''
+            }
+       }
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ['app-ec2-ssh']) {
