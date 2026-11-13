@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -71,23 +70,22 @@ pipeline {
         stage('Prepare SSH') {
             steps {
                 sh '''
-                    mkdir -p ~/.ssh
-                    chmod 700 ~/.ssh
+                    mkdir -p /var/lib/jenkins/.ssh
+                    chmod 700 /var/lib/jenkins/.ssh
 
-                    ssh-keyscan -H "$APP_HOST" >> ~/.ssh/known_hosts
-
-                    chmod 600 ~/.ssh/known_hosts
+                    ssh-keyscan -H "$APP_HOST" > /var/lib/jenkins/.ssh/known_hosts
+                    chmod 600 /var/lib/jenkins/.ssh/known_hosts
                 '''
             }
-       }
+         }
+
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ['app-ec2-ssh']) {
-
                     sh '''
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
-                            "aws ecr get-login-password --region $AWS_DEFAULT_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
+                            "aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
 
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
