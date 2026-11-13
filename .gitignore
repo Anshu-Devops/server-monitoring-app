@@ -1,0 +1,17 @@
+
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+.env
+*.pem
+*.key
+
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+crash.log
+
+.pytest_cache/
+reports/
