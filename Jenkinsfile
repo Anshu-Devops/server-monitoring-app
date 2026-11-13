@@ -85,7 +85,7 @@ pipeline {
                     sh '''
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
-                            "aws ecr get-login-password --region $AWS_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
+                            "aws ecr get-login-password --region ap-south-1 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
 
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
@@ -98,12 +98,12 @@ pipeline {
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
                             "sudo docker run -d \
-                              --name monitor-app \
-                              --restart unless-stopped \
-                              -p 5000:5000 \
-                              -e S3_BUCKET=$S3_BUCKET \
-                              -e AWS_REGION=$AWS_DEFAULT_REGION \
-                              $IMAGE_URI"
+                            --name monitor-app \
+                            --restart unless-stopped \
+                            -p 5000:5000 \
+                            -e S3_BUCKET=$S3_BUCKET \
+                            -e AWS_REGION=ap-south-1 \
+                            $IMAGE_URI"
                     '''
                 }
             }
