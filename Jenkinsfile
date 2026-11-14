@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -6,8 +7,8 @@ pipeline {
         ECR_REPOSITORY = 'server-monitoring-app'
 
         // Replace with Terraform outputs
-        APP_HOST = '3.7.253.24'
-        S3_BUCKET = 'server-monitoring-app-239711841813-fe3898e9'
+        APP_HOST = 'YOUR_APP_PUBLIC_IP'
+        S3_BUCKET = 'YOUR_S3_BUCKET_NAME'
     }
 
     stages {
@@ -67,25 +68,14 @@ pipeline {
             }
         }
 
-        stage('Prepare SSH') {
-            steps {
-                sh '''
-                    mkdir -p /var/lib/jenkins/.ssh
-                    chmod 700 /var/lib/jenkins/.ssh
-
-                    ssh-keyscan -H "$APP_HOST" > /var/lib/jenkins/.ssh/known_hosts
-                    chmod 600 /var/lib/jenkins/.ssh/known_hosts
-                '''
-            }
-         }
-
         stage('Deploy to EC2') {
             steps {
                 sshagent(credentials: ['app-ec2-ssh']) {
+
                     sh '''
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
-                            "aws ecr get-login-password --region ap-south-1 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
+                            "aws ecr get-login-password --region $AWS_DEFAULT_REGION | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
 
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
@@ -98,12 +88,12 @@ pipeline {
                         ssh -o StrictHostKeyChecking=yes \
                             ubuntu@"$APP_HOST" \
                             "sudo docker run -d \
-                            --name monitor-app \
-                            --restart unless-stopped \
-                            -p 5000:5000 \
-                            -e S3_BUCKET=$S3_BUCKET \
-                            -e AWS_REGION=ap-south-1 \
-                            $IMAGE_URI"
+                              --name monitor-app \
+                              --restart unless-stopped \
+                              -p 5000:5000 \
+                              -e S3_BUCKET=$S3_BUCKET \
+                              -e AWS_REGION=$AWS_DEFAULT_REGION \
+                              $IMAGE_URI"
                     '''
                 }
             }
