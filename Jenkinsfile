@@ -7,8 +7,8 @@ pipeline {
         ECR_REPOSITORY = 'server-monitoring-app'
 
         // Replace with Terraform outputs
-        APP_HOST = 'YOUR_APP_PUBLIC_IP'
-        S3_BUCKET = 'YOUR_S3_BUCKET_NAME'
+        APP_HOST = '3.7.252.107'
+        S3_BUCKET = 'server-monitoring-app-239711841813-58d68a96'
     }
 
     stages {
